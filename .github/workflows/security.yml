@@ -1,0 +1,44 @@
+name: FinTrust Security Pipeline
+
+on:
+  push:
+    branches: [main, feature/docker-security]
+  pull_request:
+    branches: [main]
+
+jobs:
+  appsec-and-container:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: npm audit (HIGH+)
+        run: npm audit --audit-level=high
+
+      - name: Build Docker image
+        run: docker build -t fintrust-app:ci .
+
+      - name: Trivy scan (fail HIGH/CRITICAL)
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: fintrust-app:ci
+          format: table
+          severity: HIGH,CRITICAL
+          ignore-unfixed: true
+          exit-code: '1'

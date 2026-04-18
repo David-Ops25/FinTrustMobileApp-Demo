@@ -55,6 +55,59 @@ npm run lint
 npm run security:audit
 ```
 
+## Secure Git Workflow (Feature Branch)
+
+Use a feature branch to protect `main`:
+
+```bash
+git checkout -b feature/docker-security
+git add .
+git commit -m "feat: add dockerization and security scanning"
+git push origin feature/docker-security
+```
+
+## Docker (Hardened Static Web Runtime)
+
+The container flow uses:
+- **Builder**: `node:20-alpine` to install deps and run Expo web export
+- **Runtime**: unprivileged Nginx image to serve static files as non-root
+
+Build and run:
+
+```bash
+docker build -t fintrust-app .
+docker run -p 3000:3000 fintrust-app
+```
+
+Then open [http://localhost:3000](http://localhost:3000).
+
+## Vulnerability Scanning
+
+If "Arko" refers to a scanner not available in your environment, use these standards:
+- **Trivy** (preferred)
+- **Snyk** (optional)
+- `npm audit`
+
+Local scan commands:
+
+```bash
+trivy image fintrust-app
+npm audit --audit-level=high
+```
+
+## GitHub Security Pipeline
+
+`/.github/workflows/security.yml` includes:
+- Lint gate
+- `npm audit --audit-level=high`
+- Docker image build
+- Trivy image scan that fails on **HIGH/CRITICAL** vulnerabilities
+
+## Environment Variables
+
+Use `.env.example` as the template for local configuration.  
+Do not commit real credentials, tokens, or API keys.
+
 ## Build APK / IPA
 
 Use Expo EAS for production-style artifacts:

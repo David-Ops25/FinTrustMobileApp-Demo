@@ -1,0 +1,13 @@
+node_modules
+.expo
+.git
+.github
+npm-debug.log
+yarn-error.log
+Dockerfile*
+README.md
+SECURITY.md
+.env
+.env.*
+coverage
+dist
