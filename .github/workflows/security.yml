@@ -35,12 +35,14 @@ jobs:
         run: docker build -t fintrust-app:ci .
 
       - name: Trivy scan (fail HIGH/CRITICAL)
-        uses: aquasecurity/trivy-action@v0.33.1
-        with:
-          image-ref: fintrust-app:ci
-          scanners: vuln
-          vuln-type: library
-          format: table
-          severity: HIGH,CRITICAL
-          ignore-unfixed: true
-          exit-code: '1'
+        run: >
+          docker run --rm
+          -v /var/run/docker.sock:/var/run/docker.sock
+          aquasec/trivy:0.65.0
+          image
+          --scanners vuln
+          --vuln-type library
+          --severity HIGH,CRITICAL
+          --ignore-unfixed
+          --exit-code 1
+          fintrust-app:ci
