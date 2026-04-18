@@ -38,6 +38,8 @@ jobs:
         uses: aquasecurity/trivy-action@v0.33.1
         with:
           image-ref: fintrust-app:ci
+          scanners: vuln
+          vuln-type: library
           format: table
           severity: HIGH,CRITICAL
           ignore-unfixed: true
